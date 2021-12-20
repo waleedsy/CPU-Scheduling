@@ -84,10 +84,30 @@ void none_selected()
     while ((sc_method != 1) or (sc_method != 2));
 }
 
+//first come first serve
 void FC_FS()
 {
 
 }
+
+//shortest job first
+void SJB()
+{
+
+}
+
+//Priority Scheduling
+void PRS()
+{
+
+}
+
+//Round Robin Scheduling
+void RRS()
+{
+
+}
+
 
 //To select a scheduling method
 void scheduling_method()
@@ -96,8 +116,25 @@ void scheduling_method()
         case 1:
             none_selected();
             break;
+
         case 2:
             FC_FS();
+            break;
+
+        case 3:
+            SJB();
+            break;
+
+        case 4:
+            PRS();
+            break;
+
+        case 5:
+            RRS();
+            break;
+
+        default:
+            options();
             break;
     }
 }
@@ -107,6 +144,7 @@ int main()
     options();
     scheduling_method();
     //file_input();
+    cout << "github commit trial";
 
     return 0;
 }
