@@ -1,25 +1,45 @@
 #include <iostream>
+#include <stdlib.h>
+#include <fstream>
 
 using namespace std;
 
 int sc_method; //scheduling method
-int process; //process ID
 char input; //input from file
+long waiting_time; //waiting time
+double awt; //average waiting time
 
-//scheduling values
+//process declaration
 struct process
 {
-    int arrival_time; //arrival time
-    int burst_time; //burst time
+    int arr_time; //arrival time
+    int brs_time; //burst time
     int priority; //priority
-};
 
-//final calculations
-struct computations
+    struct process *next;
+    struct process *temp;
+}process;
+
+//To read and display values from the file
+void file_input()
 {
-    int waiting_time; //waiting time
-    int awt; //average waiting time
-};
+   ifstream inp;
+   inp.open("input.txt");
+
+    do
+    {
+        char ln;
+        inp >> ln;
+        //cout << ln;
+
+        if ((!isspace(ln)))
+            {
+                cout << ln << " \n";
+            }
+    }
+    while(!inp.eof());
+    inp.close();
+}
 
 //To end a program
 void program_end()
@@ -48,18 +68,6 @@ void options()
         case 4:
             return program_end();
     }
-
-}
-
-//To read values from the file
-void file_input()
-{
-    FILE *input;
-    input = fopen("input.txt", "r");
-
-    cout << input;
-
-    fclose(input);
 }
 
 //none of the scheduling methods selected
@@ -87,6 +95,7 @@ void none_selected()
 //first come first serve
 void FC_FS()
 {
+
 
 }
 
@@ -141,9 +150,9 @@ void scheduling_method()
 
 int main()
 {
-    options();
-    scheduling_method();
-    //file_input();
+    //options();
+    //scheduling_method();
+    file_input();
 
     return 0;
 }
