@@ -1,6 +1,7 @@
 #include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <fstream>
+#include <string>
 
 using namespace std;
 
@@ -8,6 +9,8 @@ int sc_method; //scheduling method
 char input; //input from file
 long waiting_time; //waiting time
 double awt; //average waiting time
+
+int brt, art, prt;
 
 //process declaration
 struct process
@@ -17,28 +20,61 @@ struct process
     int priority; //priority
 
     struct process *next;
-    struct process *temp;
-}process;
+};
+
+process *lst;
+process *pid, *no;
 
 //To read and display values from the file
 void file_input()
 {
-   ifstream inp;
-   inp.open("input.txt");
+  string line;
 
-    do
-    {
-        char ln;
-        inp >> ln;
-        //cout << ln;
+    ifstream input("input.txt");
+    int init = 0;
 
-        if ((!isspace(ln)))
+    do {
+            for (char i: line)
             {
-                cout << ln << " \n";
+                if (isnumber(i))
+                {
+                    for (int j = 0; j <= init; j++)
+                    {
+
+                    }
+                    init++;
+                    if (init == 0)
+                    {
+                        art += i;
+                        cout << art;
+                    }
+
+                    else if (init == 1)
+                    {
+                        brt += i;
+                        cout << brt;
+                    }
+
+                    else if (init == 2)
+                    {
+                        prt += i;
+                        cout << prt;
+                    }
+                    cout << endl << i;
+                }
             }
-    }
-    while(!inp.eof());
-    inp.close();
+        }
+    while(!input.eof() and getline (input, line));
+
+    struct process *head = (process*) (malloc(sizeof(struct process)));
+    head -> arr_time = art;
+    head -> brs_time = brt;
+    head -> priority = prt;
+    head -> next = NULL;
+
+    //struct process p1 = {art, brt, prt};
+    input.close();
+    //no = lst;
 }
 
 //To end a program
@@ -96,7 +132,6 @@ void none_selected()
 void FC_FS()
 {
 
-
 }
 
 //shortest job first
@@ -148,7 +183,7 @@ void scheduling_method()
     }
 }
 
-int main()
+int main(int argc, char** argv)
 {
     //options();
     //scheduling_method();
