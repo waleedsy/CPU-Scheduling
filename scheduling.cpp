@@ -7,10 +7,8 @@ using namespace std;
 
 int sc_method; //scheduling method
 char input; //input from file
-long waiting_time; //waiting time
-double awt; //average waiting time
-
-int brt, art, prt;
+int brt, art, prt, ct, tat, noline, response;
+string line;
 
 //process declaration
 struct process
@@ -18,63 +16,119 @@ struct process
     int arr_time; //arrival time
     int brs_time; //burst time
     int priority; //priority
+    int response; //response time
+    int ct; //completion time
+    long tat; //turn around time
+    long waiting_time; //waiting time
+    double awt; //average waiting time
+    int pn;
 
     struct process *next;
+
 };
 
-process *lst;
-process *pid, *no;
 
 //To read and display values from the file
 void file_input()
 {
-  string line;
-
     ifstream input("input.txt");
     int init = 0;
 
     do {
+        getline(input, line);
+        noline ++;
             for (char i: line)
             {
                 if (isnumber(i))
                 {
-                    for (int j = 0; j <= init; j++)
-                    {
-
-                    }
                     init++;
                     if (init == 0)
                     {
                         art += i;
-                        cout << art;
                     }
 
                     else if (init == 1)
                     {
                         brt += i;
-                        cout << brt;
                     }
 
                     else if (init == 2)
                     {
                         prt += i;
-                        cout << prt;
                     }
-                    cout << endl << i;
                 }
             }
         }
     while(!input.eof() and getline (input, line));
-
-    struct process *head = (process*) (malloc(sizeof(struct process)));
-    head -> arr_time = art;
-    head -> brs_time = brt;
-    head -> priority = prt;
-    head -> next = NULL;
-
-    //struct process p1 = {art, brt, prt};
     input.close();
-    //no = lst;
+}
+
+//process insertion
+void pinsert(process **pid, int pn, int art, int brt, int prt, int response, double *pct)
+{
+   process *p, *n = *pid;
+
+    p = (process*) (malloc(sizeof(process)));
+    p -> pn = pn;
+    p -> arr_time = art;
+    p -> brs_time = brt;
+    p -> priority = prt;
+    p -> response = *pct - art;
+    p -> ct = *pct + brt;
+    p -> tat = p -> ct - art;
+    p -> waiting_time = p -> tat - brt;
+    p -> awt = p -> tat / brt;
+    *pct = *pct + brt;
+
+    p -> next =NULL;
+
+    if (*pid == NULL)
+    {
+        *pid = p;
+    }
+    else
+    {
+        do
+        {
+            n = n -> next;
+        }
+        while (n -> next != NULL);
+        n -> next = p;
+    }
+}
+
+void p_init(process *p, int pid) {
+    int count;
+    process *n = p;
+
+    for (count = 1; count <= pid; count++) {
+        cout << "Process " << p->pn;
+        p = p->next;
+    }
+
+    cout << "\n";
+    cout << " " << p -> arr_time;
+
+    for (count = 1; count <= pid; count++)
+    {
+        cout << " " << p -> ct;
+        n = n -> next;
+    }
+}
+
+//to display process
+void pdip(process *p, int pid)
+{
+    float ttt, twt, tbt;
+    ttt = twt = tbt = 0;
+
+    cout << "\n\n Process waiting times: \n" << p -> awt;
+
+    do {
+        cout << "P\n" << p -> pn;
+    }
+    while (p != NULL);
+
 }
 
 //To end a program
@@ -131,6 +185,21 @@ void none_selected()
 //first come first serve
 void FC_FS()
 {
+    process *head = NULL;
+    int pn, cnt;
+
+    for (cnt =1; cnt <= noline; cnt++)
+    {
+        switch (cnt)
+        {
+            case 1:
+                response = art;
+                pinsert(&head, cnt, art, brt, prt, response, reinterpret_cast<double *>(&response));
+        }
+    }
+
+    p_init(head, pn);
+
 
 }
 
@@ -185,8 +254,8 @@ void scheduling_method()
 
 int main(int argc, char** argv)
 {
-    //options();
-    //scheduling_method();
+    options();
+    scheduling_method();
     file_input();
 
     return 0;
