@@ -27,13 +27,42 @@ struct process
 
 };
 
+struct process *headG = NULL;
 
+//process insertion
+void pinsert(process **pid, int pn, int art, int brt, int prt)
+{
+    process *p, *n = *pid;
+
+    p = (process*) (malloc(sizeof(process)));
+    p -> pn = pn;
+    p -> arr_time = art;
+    p -> brs_time = brt;
+    p -> priority = prt;
+    p -> tat = p -> ct - art;
+    p -> waiting_time = p -> tat - brt;
+    p -> awt = p -> tat / brt;
+
+
+    p -> next =NULL;
+
+    if (*pid == NULL)
+    {
+        *pid = p;
+    }
+    else{
+        while(n->next != NULL){
+            n = n->next;
+            n->next= p;
+        }
+    }
+}
 //To read and display values from the file
 void file_input()
 {
     ifstream input("input.txt");
     int init = 0;
-
+    int i=1;
     do {
         getline(input, line);
         noline ++;
@@ -57,45 +86,15 @@ void file_input()
                         prt += i;
                     }
                 }
+                pinsert(&headG, i, art, brt, prt);
+                i++;
             }
         }
     while(!input.eof() and getline (input, line));
     input.close();
 }
 
-//process insertion
-void pinsert(process **pid, int pn, int art, int brt, int prt, int response, double *pct)
-{
-   process *p, *n = *pid;
 
-    p = (process*) (malloc(sizeof(process)));
-    p -> pn = pn;
-    p -> arr_time = art;
-    p -> brs_time = brt;
-    p -> priority = prt;
-    p -> response = *pct - art;
-    p -> ct = *pct + brt;
-    p -> tat = p -> ct - art;
-    p -> waiting_time = p -> tat - brt;
-    p -> awt = p -> tat / brt;
-    *pct = *pct + brt;
-
-    p -> next =NULL;
-
-    if (*pid == NULL)
-    {
-        *pid = p;
-    }
-    else
-    {
-        do
-        {
-            n = n -> next;
-        }
-        while (n -> next != NULL);
-        n -> next = p;
-    }
-}
 
 void p_init(process *p, int pid) {
     int count;
@@ -194,7 +193,7 @@ void FC_FS()
         {
             case 1:
                 response = art;
-                pinsert(&head, cnt, art, brt, prt, response, reinterpret_cast<double *>(&response));
+                pinsert(&head, cnt, art, brt, prt);
         }
     }
 
