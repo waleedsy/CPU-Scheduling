@@ -16,7 +16,6 @@ struct process
     int arr_time; //arrival time
     int brs_time; //burst time
     int priority; //priority
-    int response; //response time
     int ct; //completion time
     long tat; //turn around time
     long waiting_time; //waiting time
@@ -51,10 +50,10 @@ void pinsert(process **pid, int pn, int art, int brt, int prt)
         *pid = p;
     }
     else{
-        while(n->next != NULL){
-            n = n->next;
-            n->next= p;
+        while(n-> next != NULL){
+            n = n -> next;
         }
+        n -> next = p;
     }
 }
 //To read and display values from the file
@@ -101,8 +100,8 @@ void p_init(process *p, int pid) {
     process *n = p;
 
     for (count = 1; count <= pid; count++) {
-        cout << "Process " << p->pn;
-        p = p->next;
+        cout << "Process " << p -> pn;
+        p = p-> next;
     }
 
     cout << "\n";
@@ -118,15 +117,22 @@ void p_init(process *p, int pid) {
 //to display process
 void pdip(process *p, int pid)
 {
-    float ttt, twt, tbt;
-    ttt = twt = tbt = 0;
+    float twt, tbt;
+   twt = tbt = 0;
 
-    cout << "\n\n Process waiting times: \n" << p -> awt;
+    cout << "\n\n Process waiting times: \n" << p -> waiting_time;
 
     do {
         cout << "P\n" << p -> pn;
+
+        tbt += p -> brs_time;
+        twt += p -> waiting_time;
+
+        p =  p -> next;
     }
     while (p != NULL);
+
+    cout << "Average waiting time: " << twt/pid;
 
 }
 
@@ -198,7 +204,7 @@ void FC_FS()
     }
 
     p_init(head, pn);
-
+    pdip(head, pn);
 
 }
 
