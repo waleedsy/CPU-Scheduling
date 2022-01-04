@@ -7,7 +7,7 @@ using namespace std;
 
 int sc_method; //scheduling method
 char input; //input from file
-int brt, art, prt, ct, tat, noline, response;
+int brt, art, prt, tat, noline;
 string line;
 
 //process declaration
@@ -16,124 +16,123 @@ struct process
     int arr_time; //arrival time
     int brs_time; //burst time
     int priority; //priority
-    int ct; //completion time
-    long tat; //turn around time
-    long waiting_time; //waiting time
-    double awt; //average waiting time
+    float tat; //turn around time
+    float waiting_time; //waiting time
+    float awt; //average waiting time
     int pn;
 
     struct process *next;
-
 };
 
 struct process *headG = NULL;
 
-//process insertion
-void pinsert(process **pid, int pn, int art, int brt, int prt)
-{
-    process *p, *n = *pid;
+process *p_init(int art, int brst, int prt) {
+    int count;
 
-    p = (process*) (malloc(sizeof(process)));
-    p -> pn = pn;
+    process *p = (process*) malloc(sizeof (process));
+
     p -> arr_time = art;
-    p -> brs_time = brt;
+    p -> brs_time = brst;
     p -> priority = prt;
-    p -> tat = p -> ct - art;
-    p -> waiting_time = p -> tat - brt;
-    p -> awt = p -> tat / brt;
-
-
-    p -> next =NULL;
-
-    if (*pid == NULL)
-    {
-        *pid = p;
-    }
-    else{
-        while(n-> next != NULL){
-            n = n -> next;
-        }
-        n -> next = p;
-    }
+    p -> pn = count++;
+    p = p -> next;
+    return p;
 }
+
+//process insertion
+void pinsert(process *pid, int art, int brt, int prt)
+{
+   process *pn, *temp;
+   pn = p_init(art, brt, prt);
+
+   do{
+       temp = pid;
+       pid = pid -> next;
+
+       if (pid -> arr_time > art)
+       {
+           pn -> next = temp;
+           temp -> next = pn;
+
+           return;
+       }
+       pid -> next = pn;
+
+   }
+   while(pid -> next != NULL);
+
+}
+
 //To read and display values from the file
 void file_input()
 {
     ifstream input("input.txt");
     int init = 0;
-    int i=1;
     do {
         getline(input, line);
         noline ++;
-            for (char i: line)
-            {
-                if (isnumber(i))
+        for (int i = 0; i <= line[i]; i++)
+        {
+            if (line[i] == ':')
                 {
                     init++;
                     if (init == 0)
                     {
-                        art += i;
+                        art += line[i];
                     }
 
-                    else if (init == 1)
+                    if (init == 1)
                     {
-                        brt += i;
+                        brt += line[i];
                     }
 
-                    else if (init == 2)
+                    if (init == 2)
                     {
-                        prt += i;
+                        prt += line[i];
                     }
-                }
-                pinsert(&headG, i, art, brt, prt);
-                i++;
+                    i++;
+                    pinsert(headG, art, brt, prt);
             }
+           cout << noline;
         }
-    while(!input.eof() and getline (input, line));
+    }
+    while(!input.eof());
     input.close();
 }
 
-
-
-void p_init(process *p, int pid) {
-    int count;
-    process *n = p;
-
-    for (count = 1; count <= pid; count++) {
-        cout << "Process " << p -> pn;
-        p = p-> next;
-    }
-
-    cout << "\n";
-    cout << " " << p -> arr_time;
-
-    for (count = 1; count <= pid; count++)
-    {
-        cout << " " << p -> ct;
-        n = n -> next;
-    }
-}
-
 //to display process
-void pdip(process *p, int pid)
+void pdip(process *p)
 {
+    process *temp = p -> next;
     float twt, tbt;
-   twt = tbt = 0;
+    twt = tbt = 0;
 
-    cout << "\n\n Process waiting times: \n" << p -> waiting_time;
-
-    do {
+    while (temp != NULL)
+    {
         cout << "P\n" << p -> pn;
 
         tbt += p -> brs_time;
         twt += p -> waiting_time;
-
-        p =  p -> next;
+        cout << "P" << ": " << temp -> pn << ": " << temp -> waiting_time;
+        temp = temp -> next;
     }
-    while (p != NULL);
 
-    cout << "Average waiting time: " << twt/pid;
+    cout << "Average waiting time: " << twt / noline;
 
+}
+
+//waiting time calculation
+void wt(process *pn)
+{
+    process *temp = pn -> next;
+    while (temp != NULL)
+    {
+        temp -> tat = temp -> priority - temp -> arr_time;
+        temp -> waiting_time += temp -> tat - temp -> brs_time;
+        temp -> tat += temp -> waiting_time;
+        temp = temp -> next;
+
+    }
 }
 
 //To end a program
@@ -146,6 +145,7 @@ void program_end()
 //Main Menu
 void options()
 {
+    file_input();
     int menu;
     do{
         cout << "\n\n*** CPU Scheduling Simulator***\n1 -> Scheduling Method (None)\n2) -> Preemptive Mode(Off)\n3) -> Show result\n4) -> End program\n\nPlease select 1 option: \n";
@@ -193,18 +193,18 @@ void FC_FS()
     process *head = NULL;
     int pn, cnt;
 
-    for (cnt =1; cnt <= noline; cnt++)
+    for (cnt = 1; cnt <= noline; cnt++)
     {
         switch (cnt)
         {
             case 1:
-                response = art;
-                pinsert(&head, cnt, art, brt, prt);
+                pinsert(head, art, brt, prt);
         }
+        wt(head);
     }
-
-    p_init(head, pn);
-    pdip(head, pn);
+    p_init(art, brt, prt);
+    pdip(head);
+    cout << art;
 
 }
 
@@ -261,7 +261,6 @@ int main(int argc, char** argv)
 {
     options();
     scheduling_method();
-    file_input();
 
     return 0;
 }
